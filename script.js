@@ -15,24 +15,44 @@ document.querySelectorAll(".nav-links a").forEach((link) => {
 
 document.getElementById("year").textContent = new Date().getFullYear();
 
-const contactForm = document.getElementById("contactForm");
-contactForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-
-  const formData = new FormData(contactForm);
-  const name = formData.get("name");
-  const email = formData.get("email");
-  const service = formData.get("service");
-  const message = formData.get("message") || "Não informado";
-
-  // Troque pelo e-mail oficial da empresa antes de publicar.
-  const destinationEmail = "contato@seudominio.com";
-  const subject = encodeURIComponent(`Novo contato pelo site — ${name}`);
-  const body = encodeURIComponent(
-    `Nome: ${name}\nE-mail: ${email}\nServiço: ${service}\n\nProjeto:\n${message}`
-  );
-
-  document.getElementById("formNote").textContent =
-    "Abrindo seu aplicativo de e-mail. Se não abrir, verifique a configuração do navegador.";
-  window.location.href = `mailto:${destinationEmail}?subject=${subject}&body=${body}`;
+// Configuração do Scroll Reveal
+const revealElements = document.querySelectorAll(".reveal");
+const revealOptions = {
+  root: null,
+  threshold: 0.1, 
+  rootMargin: "0px 0px -50px 0px" 
+};
+const revealObserver = new IntersectionObserver((entries, observer) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add("active");
+      observer.unobserve(entry.target); 
+    }
+  });
+}, revealOptions);
+revealElements.forEach((el) => {
+  revealObserver.observe(el);
 });
+
+// Ocultar Botão WhatsApp Flutuante ao chegar na Seção de Contato
+const contactSection = document.getElementById("contato");
+const floatingWppBtn = document.getElementById("floatingWpp");
+
+if (contactSection && floatingWppBtn) {
+  const wppObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        // Se a seção de contato estiver visível na tela, esconde o botão flutuante
+        floatingWppBtn.classList.add("hidden");
+      } else {
+        // Quando rolar para cima, o botão flutuante volta a aparecer
+        floatingWppBtn.classList.remove("hidden");
+      }
+    });
+  }, {
+    root: null,
+    threshold: 0.1 // Oculta o botão assim que 10% da seção de contato aparecer
+  });
+  
+  wppObserver.observe(contactSection);
+}
